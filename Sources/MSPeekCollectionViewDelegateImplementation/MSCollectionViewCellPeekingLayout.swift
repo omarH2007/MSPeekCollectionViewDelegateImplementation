@@ -29,6 +29,8 @@ open class MSCollectionViewCellPeekingLayout: UICollectionViewLayout {
 
     open var scrollDirection: UICollectionView.ScrollDirection
 
+    open var rightInset: CGFloat = 0.0
+    
     var boundsWidth: CGFloat {
         return collectionView?.bounds.width ?? 1
     }
@@ -64,8 +66,9 @@ open class MSCollectionViewCellPeekingLayout: UICollectionViewLayout {
         }
     }
 
-    public init(scrollDirection: UICollectionView.ScrollDirection) {
+    public init(scrollDirection: UICollectionView.ScrollDirection,rightInset: CGFloat = 0.0) {
         self.scrollDirection = scrollDirection
+        self.rightInset = rightInset
         super.init()
     }
 
@@ -133,8 +136,9 @@ open class MSCollectionViewCellPeekingLayout: UICollectionViewLayout {
         let safeIndex = max(0, min(index, numberOfItems))
         switch scrollDirection {
         case .horizontal:
+            let xPadding:CGFloat = index == 0 ? rightInset:0
             let x = frameForItem(index: safeIndex).minX - spacingLength - peekingLength
-            return CGPoint(x: x, y: 0)
+            return CGPoint(x: x+xPadding, y: 0)
         case .vertical:
             let y = frameForItem(index: safeIndex).minY - spacingLength - peekingLength
             return CGPoint(x: 0, y: y)
@@ -184,4 +188,10 @@ open class MSCollectionViewCellPeekingLayout: UICollectionViewLayout {
     override open func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
         return getCollectionViewLayoutAttributes(index: indexPath.row)
     }
+   
+    open override var flipsHorizontallyInOppositeLayoutDirection: Bool {
+        let isLanguageRTL = UIApplication.shared.windows.first(where: { $0.isKeyWindow })?.semanticContentAttribute == .forceRightToLeft
+        return isLanguageRTL
+    }
+    
 }
